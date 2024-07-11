@@ -4,22 +4,38 @@
 
 #This script was used to calculate summary statistics of each C-CAP-derived GIS layer by acreage, in US survey acres. Code sections are organized by native and restorable habitat categories.
 
+library(readr)
+library(googledrive)
 
+# authorize access to gdrive and get file
+drive_auth() # requires google account/gmail
+gdrive_pth <- 'https://drive.google.com/drive/u/0/folders/1PIvrJj1Pw5B5C5FrXpGiPAKxzgbmIwrY'
+fls <- drive_ls(gdrive_pth, type = 'csv')
 
+# download file to temp loaction, import columns as factors in fctcol
+# read file, delete temp, and return
+getcsv_fun <- function(flnm, col_types, fls){
+
+  temp_file <- tempfile(fileext = ".csv")
+  id <- fls$id[fls$name == flnm]
+  url <- paste0('https://drive.google.com/file/d/', id, '/view?usp=drive_link')
+  drive_download(file = url, path = temp_file, overwrite = T)
+  df <- read_csv(temp_file, col_types = col_types)
+  unlink(temp_file)
+  return(df)
+  
+}
 
 ######################################################################
 #####################CURRENT EXTENT###################################
 ######################################################################
 
 #import csv file, change 'gridcode' column type to factor
-library(readr)
-CCAP2021_TBEP_NativeHabitat_Table <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/CCAP2021_TBEP_NativeHabitat_Table.csv", col_types = cols(gridcode = col_factor(levels = c("8", "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))))
+CCAP2021_TBEP_NativeHabitat_Table <- getcsv_fun('CCAP2021_TBEP_NativeHabitat_Table.csv', col_types = cols(gridcode = col_factor(levels = c("8", "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))), fls = fls)
 View(CCAP2021_TBEP_NativeHabitat_Table)
 
-
 ##import csv file, change 'gridcode' column type to factor
-library(readr)
-CCAP2021_TBEP_TotalRestOpp_Table <- read_csv("CCAP2021_TBEP_TotalRestOpp_Table.csv", col_types = cols(gridcode = col_factor(levels = c("5", "6", "7", "8", "11", "20"))))
+CCAP2021_TBEP_TotalRestOpp_Table <- getcsv_fun('CCAP2021_TBEP_TotalRestOpp_Table.csv', col_types = cols(gridcode = col_factor(levels = c("5", "6", "7", "8", "11", "20"))), fls = fls)
 View(CCAP2021_TBEP_TotalRestOpp_Table)
 
 native <-CCAP2021_TBEP_NativeHabitat_Table
@@ -47,9 +63,7 @@ resthabs
 #On native habitats
 
 #import csv file, change 'gridcode' column type to factor
-library(readr)
-CCAP2021_TBEP_Native_Exist_Cons_Lands <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/CCAP2021_TBEP_Native_Exist_Cons_Lands.csv", 
- col_types = cols(gridcode = col_factor(levels = c("8", "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))))
+CCAP2021_TBEP_Native_Exist_Cons_Lands <- getcsv_fun('https://drive.google.com/file/d/1swtunH5WItZAWGF8ourQZnJehttWVI2f/view?usp=drive_link', col_types = cols(gridcode = col_factor(levels = c("8", "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))), fls = fls)
 View(CCAP2021_TBEP_Native_Exist_Cons_Lands)
 
 #calculate acreage sums for native habitats, by C-CAP habitat type ('gridcode')
@@ -63,8 +77,7 @@ natconshabs
 
 ##tidal wetlands of existing restoration opportunities
 #import csv file, change 'gridcode_1' column type to factor
-library(readr)
-CCAP2021_TBEP_TotalRestOpp_TidalWetland_ExisCons <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/CCAP2021_TBEP_TotalRestOpp_TidalWetland_ExisCons.csv", col_types = cols(gridcode_1 = col_factor(levels = c("5", "6", "7", "8", "11", "19", "20"))))
+CCAP2021_TBEP_TotalRestOpp_TidalWetland_ExisCons <- getcsv_fun('CCAP2021_TBEP_TotalRestOpp_TidalWetland_ExisCons.csv', col_types = cols(gridcode_1 = col_factor(levels = c("5", "6", "7", "8", "11", "19", "20"))), fls = fls)
 View(CCAP2021_TBEP_TotalRestOpp_TidalWetland_ExisCons)
 
 #calculate acreage sums for tidal wetland habitats, by C-CAP habitat type ('gridcode_1')
@@ -74,8 +87,7 @@ twhabs
 
 ##freshwater wetlands on existing restoration opportunities
 #import csv file, change 'gridcode_1' column type to factor
-library(readr)
-CCAP2021_TBEP_TotalRestOpp_FW_ExisCons_Table <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/CCAP2021_TBEP_TotalRestOpp_FW_ExisCons_Table.csv", col_types = cols(gridcode_1 = col_factor(levels = c("5","6", "7", "8", "11", "20"))))
+CCAP2021_TBEP_TotalRestOpp_FW_ExisCons_Table <- getcsv_fun('CCAP2021_TBEP_TotalRestOpp_FW_ExisCons_Table.csv', col_types = cols(gridcode_1 = col_factor(levels = c("5","6", "7", "8", "11", "20"))), fls = fls)
 View(CCAP2021_TBEP_TotalRestOpp_FW_ExisCons_Table)
 
 #calculate acreage sums for freshwater wetland habitats, by C-CAP habitat type ('gridcode_1')
@@ -85,8 +97,7 @@ fwhabs
 
 ##non-coastal uplands on existing restoration opportunities
 #import csv file, change 'gridcode_1' column type to factor
-library(readr)
-CCAP2021_TBEP_TotalRestOpp_NCUpland_ExisCons_Table <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/CCAP2021_TBEP_TotalRestOpp_NCUpland_ExisCons_Table.csv",col_types = cols(gridcode = col_factor(levels = c("5", "6", "7", "8", "11", "19", "20"))))
+CCAP2021_TBEP_TotalRestOpp_NCUpland_ExisCons_Table <- getcsv_fun('CCAP2021_TBEP_TotalRestOpp_NCUpland_ExisCons_Table.csv', col_types = cols(gridcode = col_factor(levels = c("5", "6", "7", "8", "11", "19", "20"))), fls = fls)
 View(CCAP2021_TBEP_TotalRestOpp_NCUpland_ExisCons_Table)
 
 #calculate acreage sums for non-coastal upland habitats, by C-CAP habitat type ('gridcode')
@@ -96,9 +107,7 @@ uphabs
 
 ##coastal uplands on existing restoration opportunities
 #import csv file, change 'gridcode' column type to factor
-library(readr)
-CCAP2021_TBEP_TotalRestOpp_CoastalUpland_ExisCons_Table <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/CCAP2021_TBEP_TotalRestOpp_CoastalUpland_ExisCons_Table.csv", col_types = cols(gridcode = col_factor(levels = c("5", 
-"6", "7", "8", "11", "20"))))
+CCAP2021_TBEP_TotalRestOpp_CoastalUpland_ExisCons_Table <- getcsv_fun('CCAP2021_TBEP_TotalRestOpp_CoastalUpland_ExisCons_Table.csv', col_types = cols(gridcode = col_factor(levels = c("5", "6", "7", "8", "11", "20"))), fls = fls)
 View(CCAP2021_TBEP_TotalRestOpp_CoastalUpland_ExisCons_Table)
 
 #calculate acreage sums for coastal upland habitats, by C-CAP habitat type ('gridcode')
@@ -117,8 +126,7 @@ cuhabs
 
 #on native habitat
 #import csv file, change 'gridcode' column type to factor
-library(readr)
-CCAP2021_TBEP_NativeHab_2021ProposedConsLands_Intersect <- read_csv("CCAP2021_TBEP_NativeHab_2021ProposedConsLands_Intersect.csv", col_types = cols(gridcode = col_factor(levels = c("8",  "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))))
+CCA2021_TBEP_NativeHab_2021ProposedConsLands_Intersect <- getcsv_fun('CCAP2021_TBEP_NativeHab_2021ProposedConsLands_Intersect.csv', col_types = cols(gridcode = col_factor(levels = c("8",  "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))), fls = fls)
 View(CCAP2021_TBEP_NativeHab_2021ProposedConsLands_Intersect)
 
 #calculate acreage sums for coastal upland habitats, by C-CAP habitat type ('gridcode')
@@ -130,10 +138,9 @@ natprophabs
 
 
 #On restorable habitats
-library(readr)
-CCAP2021_TBEP_TotalRestOpp_PropCons_Table <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/CCAP2021_TBEP_TotalRestOpp_PropCons_Table.csv",col_types = cols(gridcode = col_factor(levels = c("5", "6", "7", "8", "11", "20"))))
+CCAP2021_TBEP_TotalRestOpp_PropCons_Table <- getcsv_fun('CCAP2021_TBEP_TotalRestOpp_PropCons_Table.csv', col_types = cols(gridcode = col_factor(levels = c("5", "6", "7", "8", "11", "20"))), fls = fls)
 View(CCAP2021_TBEP_TotalRestOpp_PropCons_Table)
-
+                                                        
 #calculate acreage sums restorable habitats, by C-CAP habitat type ('gridcode')
 restprop <- CCAP2021_TBEP_TotalRestOpp_PropCons_Table
 restprophabs <- aggregate(restprop$acres , by=list(Group=restprop$gridcode), FUN=sum)
@@ -148,8 +155,7 @@ restprophabs
 
 #On native habitats
 #import csv file, change 'gridcode_1' column type to factor
-library(readr)
-CCAP2021_TBEP_Unprotected_Native_Coastal <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/CCAP2021_TBEP_Unprotected_Native_Coastal.csv", col_types = cols(gridcode_1 = col_factor(levels = c("8", "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))))
+CCA2021_TBEP_Unprotected_Native_Coastal <- getcsv_fun('CCAP2021_TBEP_Unprotected_Native_Coastal.csv', col_types = cols(gridcode_1 = col_factor(levels = c("8",  "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))), fls = fls)
 View(CCAP2021_TBEP_Unprotected_Native_Coastal)
 
 #calculate acreage sums native habitats, by C-CAP habitat type ('gridcode_1')
@@ -162,8 +168,7 @@ natunphabs
 
 #on restorable habitats
 #import csv file, change 'gridcode_1' column type to factor
-library(readr)
-CCAP2021_TBEP_Reservation_Restorable_Table <- read_csv("CCAP2021_TBEP_Reservation_Restorable_Table.csv", col_types = cols(gridcode_1 = col_factor(levels = c("5", "6", "7", "8", "11", "20"))))
+CCAP2021_TBEP_Reservation_Restorable_Table <- getcsv_fun('CCAP2021_TBEP_Reservation_Restorable_Table.csv', col_types = cols(gridcode_1 = col_factor(levels = c("5", "6", "7", "8", "11", "20"))), fls = fls)
 View(CCAP2021_TBEP_Reservation_Restorable_Table)
 
 #calculate acreage sums on restorable habitats, by C-CAP habitat type ('gridcode_1')
@@ -181,8 +186,7 @@ restunphabs
 #on native habitats
 #EXISTING CONSERVATION LANDS-NATIVE
 #import csv file, change 'gridcode_1' column type to factor
-library(readr)
-NewOppExistConsNative <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/NewOppExistConsNative.csv", col_types = cols(gridcode = col_factor(levels = c("8", "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))))
+NewOppExistConsNative <- getcsv_fun('NewOppExistConsNative.csv', col_types = cols(gridcode = col_factor(levels = c("8",  "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))), fls = fls)
 View(NewOppExistConsNative)
 
 #calculate acreage sums on native habitats, by C-CAP habitat type ('gridcode')
@@ -194,8 +198,7 @@ necnacre
 
 #PROPOSED CONSERVATION LANDS-NATIVE
 #import csv file, change 'gridcode' column type to factor
-library(readr)
-NewOppExistConsNative <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/NewOppPropConsNative.csv", col_types = cols(gridcode = col_factor(levels = c("8", "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))))
+NewOppPropConsNative <- getcsv_fun('NewOppPropConsNative.csv', col_types = cols(gridcode = col_factor(levels = c("8",  "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))), fls = fls)
 View(NewOppPropConsNative)
 
 #calculate acreage sums on native habitats, by C-CAP habitat type ('gridcode')
@@ -207,8 +210,7 @@ npcnacre
 
 #PROPOSED RESERVATION LANDS-NATIVE
 #import csv file, change 'gridcode_1' column type to factor
-library(readr)
-NewOppReservationNative <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/NewOppReservationNative.csv",col_types = cols(gridcode_1 = col_factor(levels = c("8", "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))))
+NewOppReservationNative <- getcsv_fun('NewOppReservationNative.csv', col_types = cols(gridcode_1 = col_factor(levels = c("8",  "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))), fls = fls)
 View(NewOppReservationNative)
 
 #calculate acreage sums on native habitats, by C-CAP habitat type ('gridcode')
@@ -221,8 +223,7 @@ nprnacre
 #on restorable habitats
 #EXISTING CONSERVATION LANDS-RESTORABLE
 #import csv file, change 'gridcode' column type to factor
-library(readr)
-CCAP2021_TBEP_NewOpp_Restorable_Exis_Cons <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/CCAP2021_TBEP_NewOpp_Restorable_Exis_Cons.csv", col_types = cols(gridcode = col_factor(levels = c("5", "6", "7", "8", "11", "20"))))
+CCAP2021_TBEP_NewOpp_Restorable_Exis_Cons <- getcsv_fun('CCAP2021_TBEP_NewOpp_Restorable_Exis_Cons.csv', col_types = cols(gridcode = col_factor(levels = c("5", "6", "7", "8", "11", "20"))), fls = fls)
 View(CCAP2021_TBEP_NewOpp_Restorable_Exis_Cons)
 
 #calculate acreage sums on restorable habitats, by C-CAP habitat type ('gridcode')
@@ -235,8 +236,7 @@ necracre
 
 #PROPOSED CONSERVATION LANDS-RESTORABLE
 #import csv file, change 'gridcode_12' column type to factor
-library(readr)
-CCAP2021_TBEP_NewOpp_RestPropCons <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/CCAP2021_TBEP_NewOpp_RestPropCons.csv", col_types = cols(gridcode_12 = col_factor(levels = c("5", "6", "7", "8", "11", "20"))))
+CCAP2021_TBEP_NewOpp_RestPropCons <- getcsv_fun('CCAP2021_TBEP_NewOpp_RestPropCons.csv', col_types = cols(gridcode_12 = col_factor(levels = c("5", "6", "7", "8", "11", "20"))), fls = fls)
 View(CCAP2021_TBEP_NewOpp_RestPropCons)
 
 
@@ -249,9 +249,7 @@ npcracre
 
 #PROPOSED RESERVATION LANDS-RESTORABLE
 #import csv file, change 'gridcode_1' column type to factor
-library(readr)
-CCAP2021_TBEP_NewOpp_ReservationRest <- read_csv("ArcGIS/C-CAP/TBEP_CCAP/CCAP2021_TBEP_NewOpp_ReservationRest.csv", 
-col_types = cols(gridcode_1 = col_factor(levels = c("5", "6", "7", "8", "11", "20"))))
+CCAP2021_TBEP_NewOpp_ReservationRest <- getcsv_fun('CCAP2021_TBEP_NewOpp_ReservationRest.csv', col_types = cols(gridcode_1 = col_factor(levels = c("5", "6", "7", "8", "11", "20"))), fls = fls)
 View(CCAP2021_TBEP_NewOpp_ReservationRest)
 
 #calculate acreage sums on restorable habitats, by C-CAP habitat type ('gridcode_1')
