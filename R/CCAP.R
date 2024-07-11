@@ -9,7 +9,7 @@ library(googledrive)
 
 # authorize access to gdrive and get file
 drive_auth() # requires google account/gmail
-gdrive_pth <- 'https://drive.google.com/drive/u/0/folders/1PIvrJj1Pw5B5C5FrXpGiPAKxzgbmIwrY'
+gdrive_pth <- 'https://drive.google.com/drive/u/0/folders/1oXJHGuVBYpsClGPX1lMDTkvnrvHuemNz'
 fls <- drive_ls(gdrive_pth, type = 'csv')
 
 # download file to temp loaction, import columns as factors in fctcol
