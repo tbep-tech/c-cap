@@ -8,8 +8,9 @@ library(readr)
 library(googledrive)
 
 # authorize access to gdrive and get file
-drive_auth() # requires google account/gmail
-gdrive_pth <- 'https://drive.google.com/drive/u/0/folders/1oXJHGuVBYpsClGPX1lMDTkvnrvHuemNz'
+# drive_auth() # requires google account/gmail
+drive_deauth() # deauthorize access
+gdrive_pth <- 'https://drive.google.com/drive/u/0/folders/1ShcbuRR4B1qZdybAuvTbA1goq_gy8qXB'
 fls <- drive_ls(gdrive_pth, type = 'csv')
 
 # download file to temp loaction, import columns as factors in fctcol
@@ -63,7 +64,7 @@ resthabs
 #On native habitats
 
 #import csv file, change 'gridcode' column type to factor
-CCAP2021_TBEP_Native_Exist_Cons_Lands <- getcsv_fun('https://drive.google.com/file/d/1swtunH5WItZAWGF8ourQZnJehttWVI2f/view?usp=drive_link', col_types = cols(gridcode = col_factor(levels = c("8", "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))), fls = fls)
+CCAP2021_TBEP_Native_Exist_Cons_Lands <- getcsv_fun('CCAP2021_TBEP_Native_Exist_Cons_Lands.csv', col_types = cols(gridcode = col_factor(levels = c("8", "11", "12", "13", "14", "15", "22", "16", "17", "18", "23"))), fls = fls)
 View(CCAP2021_TBEP_Native_Exist_Cons_Lands)
 
 #calculate acreage sums for native habitats, by C-CAP habitat type ('gridcode')
